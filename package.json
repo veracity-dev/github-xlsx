@@ -9,7 +9,7 @@
   "license": "UNLICENSED",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "tsc-watch --onSuccess 'node dist/main.js'",
+    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/main.js\"",
     "fmt": "prettier -w 'src/**/*.{ts,json}'"
   },
   "devDependencies": {
