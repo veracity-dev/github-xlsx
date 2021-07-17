@@ -1,21 +1,21 @@
 {
-  "name": "github-xlsx",
-  "version": "0.1.0",
-  "description": "A CLI tool for exporting GitHub issues as XLSX files",
-  "author": "github-xlsx authors",
-  "repository": {
-    "url": "https://github.com/veracity-dev/github-xlsx"
-  },
-  "license": "UNLICENSED",
-  "main": "dist/main.js",
-  "scripts": {
-    "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/main.js\"",
-    "fmt": "prettier -w 'src/**/*.{ts,json}'"
-  },
-  "devDependencies": {
-    "@types/node": "^16.3.2",
-    "prettier": "^2.3.2",
-    "tsc-watch": "^4.4.0",
-    "typescript": "^4.3.5"
-  }
+    "name": "github-xlsx",
+    "version": "0.1.0",
+    "description": "A CLI tool for exporting GitHub issues as XLSX files",
+    "author": "github-xlsx authors",
+    "repository": {
+        "url": "https://github.com/veracity-dev/github-xlsx"
+    },
+    "license": "UNLICENSED",
+    "main": "dist/main.js",
+    "scripts": {
+        "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/main.js\"",
+        "fmt": "prettier -w 'src/**/*.{ts,json}'"
+    },
+    "devDependencies": {
+        "@types/node": "^16.3.2",
+        "prettier": "^2.3.2",
+        "tsc-watch": "^4.4.0",
+        "typescript": "^4.3.5"
+    }
 }
