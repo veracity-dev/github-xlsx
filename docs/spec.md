@@ -18,6 +18,11 @@ The official [GitHub CLI](todo-url) allows:
 
 ## Features
 
+- Accepts Inputs
+- Display Progress
+- Build/Export Excel files
+- Security
+
 ### ?
 
 ### ??
