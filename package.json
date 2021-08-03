@@ -10,12 +10,18 @@
     "main": "dist/main.js",
     "scripts": {
         "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/main.js\"",
-       "fmt":"prettier -w 'src/**/*.{ts,json}'"
+        "fmt": "prettier -w 'src/**/*.{ts,json}'"
     },
     "devDependencies": {
         "@types/node": "^16.3.2",
         "prettier": "^2.3.2",
         "tsc-watch": "^4.4.0",
         "typescript": "^4.3.5"
+    },
+    "dependencies": {
+        "graphql": "^15.5.1",
+        "graphql-request": "^3.5.0",
+        "json2csv": "^5.0.6",
+        "minimist": "^1.2.5"
     }
 }
