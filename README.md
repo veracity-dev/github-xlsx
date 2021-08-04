@@ -1,3 +1,3 @@
-# GitHub XLSX
+# Experiments
 
-A CLI tool for exporting GitHub issues as XLSX files.
+Experimental projects go here.
