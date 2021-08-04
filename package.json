@@ -17,11 +17,5 @@
         "prettier": "^2.3.2",
         "tsc-watch": "^4.4.0",
         "typescript": "^4.3.5"
-    },
-    "dependencies": {
-        "graphql": "^15.5.1",
-        "graphql-request": "^3.5.0",
-        "json2csv": "^5.0.6",
-        "minimist": "^1.2.5"
     }
 }
