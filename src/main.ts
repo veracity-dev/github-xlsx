@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-const octokit = new Octokit({baseUrl: 'https://api.github.com/search/issues?q= type:issue'});
+const octokit = new Octokit({baseUrl: 'https://api.github.com/search/issues?q=author:nalaka type:issue'});
 
 /**
  * Fetching all the issues
