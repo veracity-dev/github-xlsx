@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/rest";
-//const octokit = new Octokit({baseUrl: 'https://api.github.com/search/issues?q=author:nalaka type:issue'});
+var json2xls = require('json2xls');
+
 const octokit = new Octokit({baseUrl: 'https://api.github.com'});
 const prompt = require('prompt-sync')({sigint: true});
 var fs = require("fs");
@@ -14,9 +15,7 @@ async function getAllIssues(owner:string,repo:string) {
     try {
 
       const repo = prompt('Enter Repo Name: ');
-     //console.log(`Repo name is ${repo}`);
       const owner = prompt('Enter Owner Name: ');
-      //console.log(`Owner name is ${owner}`);
 
       const {data} = await octokit.rest.issues.listForRepo({
         owner: owner,
@@ -32,6 +31,10 @@ async function getAllIssues(owner:string,repo:string) {
   }
 
 function generateJsonFile(jsonData: any) {
+
+  var xls = json2xls(jsonData);
+  fs.writeFileSync('data1.xlsx', xls, 'binary');
+
   console.log("Date : ", jsonData);
   fs.writeFile(
     "output.json",
@@ -44,7 +47,7 @@ function generateJsonFile(jsonData: any) {
   )
 }
 
-
 getAllIssues("veracity-dev","github-xlsx");
+
 
 
