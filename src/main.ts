@@ -2,6 +2,7 @@ import { Octokit } from "@octokit/rest";
 //const octokit = new Octokit({baseUrl: 'https://api.github.com/search/issues?q=author:nalaka type:issue'});
 const octokit = new Octokit({baseUrl: 'https://api.github.com'});
 const prompt = require('prompt-sync')({sigint: true});
+var fs = require("fs");
 
 /**
  * Fetching all the issues
@@ -30,8 +31,17 @@ async function getAllIssues(owner:string,repo:string) {
     }
   }
 
-function generateJsonFile(data: any) {
-  console.log("Date : ", data);
+function generateJsonFile(jsonData: any) {
+  console.log("Date : ", jsonData);
+  fs.writeFile(
+    "output.json",
+    JSON.stringify(jsonData),
+    function (err: Error) {
+      if (err) {
+        console.log(err);
+      }
+    }
+  )
 }
 
 
