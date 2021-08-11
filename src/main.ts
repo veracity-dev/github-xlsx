@@ -9,8 +9,6 @@ const prompt = require('prompt-sync')({sigint: true});
  * @param repo 
  */
  
-
-
 async function getAllIssues(owner:string,repo:string) {
     try {
 
@@ -18,6 +16,7 @@ async function getAllIssues(owner:string,repo:string) {
      //console.log(`Repo name is ${repo}`);
       const owner = prompt('Enter Owner Name: ');
       //console.log(`Owner name is ${owner}`);
+
       const {data} = await octokit.rest.issues.listForRepo({
         owner: owner,
         repo: repo
