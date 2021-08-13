@@ -33,7 +33,7 @@ async function getAllIssues(owner:string,repo:string) {
 function generateJsonFile(jsonData: any) {
 
   var xls = json2xls(jsonData);
-  fs.writeFileSync('data1.xlsx', xls, 'binary');
+  fs.writeFileSync('data2.xlsx', xls, 'binary');
 
   console.log("Date : ", jsonData);
   fs.writeFile(
