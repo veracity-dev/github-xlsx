@@ -11,18 +11,18 @@ var fs = require("fs");
  * @param repo 
  */
  
-async function getAllIssues(owner:string,repo:string) {
+async function getAllIssues(a1: string, s2: string) {
     try {
 
-      const repo = prompt('Enter Repo Name: ');
-      const owner = prompt('Enter Owner Name: ');
+      // const repo = prompt('Enter Repo Name: ');
+      // const owner = prompt('Enter Owner Name: ');
 
       const {data} = await octokit.rest.issues.listForRepo({
-        owner: owner,
-        repo: repo
+        owner: a1,
+        repo: s2
       });;
   
-      generateJsonFile(data)
+      generateJsonFile(data.map(i => objectTransfer(i)));
       
     } catch (error) {
         console.log("Ërror",error);
@@ -31,23 +31,34 @@ async function getAllIssues(owner:string,repo:string) {
   }
 
 function generateJsonFile(jsonData: any) {
-
+  const now = new Date();
+  const fileName = now.getTime() + ".xlxs"
+  console.log(fileName);
   var xls = json2xls(jsonData);
-  fs.writeFileSync('data1.xlsx', xls, 'binary');
-
+  fs.writeFileSync(fileName, xls, 'binary');
   console.log("Date : ", jsonData);
-  fs.writeFile(
-    "output.json",
-    JSON.stringify(jsonData),
-    function (err: Error) {
-      if (err) {
-        console.log(err);
-      }
-    }
-  )
+  // fs.writeFile(
+  //   "output.json",
+  //   JSON.stringify(jsonData),
+  //   function (err: Error) {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //   }
+  // )
 }
 
-getAllIssues("veracity-dev","github-xlsx");
+function objectTransfer(jsonData: any){
+  return {
+    'Number': jsonData['number'],
+    'Title': jsonData['title'],
+    'Creation_On' : jsonData['created_at'],
+    'Last_Updated_On': jsonData['updated_at'],
+    'Status': jsonData['state'],
+  }
+}
+
+getAllIssues("veracity-dev", "github-xlsx");
 
 
 
