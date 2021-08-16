@@ -36,7 +36,7 @@ function generateJsonFile(jsonData: any) {
   var xls = json2xls(jsonData);
   fs.writeFileSync(fileName, xls, 'binary');
   console.log("Date : ", jsonData);
-  // fs.writeFile(
+  /*// fs.writeFile(
   //   "output.json",
   //   JSON.stringify(jsonData),
   //   function (err: Error) {
@@ -44,7 +44,7 @@ function generateJsonFile(jsonData: any) {
   //       console.log(err);
   //     }
   //   }
-  // )
+  // )*/
 }
 
 function objectTransfer(jsonData: any){
@@ -57,7 +57,7 @@ function objectTransfer(jsonData: any){
   }
 }
 
-// getAllIssues("veracity-dev", "github-xlsx");
+/*// getAllIssues("veracity-dev", "github-xlsx");*/
 getAllIssues();
 
 
