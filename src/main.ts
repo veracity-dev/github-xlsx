@@ -41,17 +41,19 @@ function generateJsonFile(jsonData: any) {
 }
 
 function objectTransfer(jsonData: any){
-  return {
+  var pull_request = jsonData['pull_request']
+
+  if(pull_request){
+    return{}
+  }else{
+    return {
     'Number': jsonData['number'],
     'Title': jsonData['title'],
     'Creation_On' : jsonData['created_at'],
     'Last_Updated_On': jsonData['updated_at'],
     'Status': jsonData['state'],
-    'Pull_Request': jsonData['pull_request'],
+    }
   }
 }
 
 getAllIssues();
-
-
-
