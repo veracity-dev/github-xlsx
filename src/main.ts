@@ -59,7 +59,7 @@ function objectTransfer(jsonData: any){
 }
 const graphqlWithAuth = graphql.defaults({
   headers: {
-    authorization: `bearer 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`,
+    authorization: `token`,
   },
 });
 //query making
