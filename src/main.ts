@@ -1,5 +1,7 @@
 import { Octokit } from "@octokit/rest";
+import { type } from "os";
 var json2xls = require('json2xls');
+const { graphql } = require("@octokit/graphql");
 
 const octokit = new Octokit({baseUrl: 'https://api.github.com'});
 const prompt = require('prompt-sync')({sigint: true});
@@ -55,5 +57,70 @@ function objectTransfer(jsonData: any){
     }
   }
 }
+const graphqlWithAuth = graphql.defaults({
+  headers: {
+    authorization: `bearer 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`,
+  },
+});
+//query making
+const repository = async () => {
+  return await graphqlWithAuth(`
+  {
+    repository(owner: "veracity-dev", name: "github-xlsx") {
+      issues(last: 3) {
+        nodes {
+          title,
+          body,
+          url,
+          assignees(first:100){
+            nodes{
+              avatarUrl
+              name
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+`);
+} 
+type assignees = {
+  avatarUrl : string,
+  name : string,
+  url :string
 
-getAllIssues();
+}
+type assigneeNode = {
+  node: assignees []
+}
+type node = {
+  title: string,
+  body: string,
+  url : string,
+  assignees : assigneeNode
+}
+
+type issues = {
+  nodes: node[] 
+}
+
+type repository = {
+  issues: issues
+}
+
+type response = {
+  repository: repository
+}
+
+repository().then(x => {
+  const rr = <response> x;
+  console.log(JSON.stringify(rr));
+  console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
+  console.log(rr.repository.issues); // printing issues
+  console.log(rr);
+  
+}).catch(e => console.log(e));
+
+
+//getAllIssues();
