@@ -57,17 +57,46 @@ function objectTransfer(jsonData: any){
     }
   }
 }
-const graphqlWithAuth = graphql.defaults({
-  headers: {
-    authorization: `token`,
-  },
-});
+
+function load() {
+  const repo = prompt('Enter Repo Name: ');
+  const owner = prompt('Enter Owner Name: ');
+  const token = prompt('Enter Token: ');
+
+  const graphqlWithAuth = graphql.defaults({
+    headers: {
+      authorization: `bearer ${token}`,
+    },
+  });
+
+  const repos = repository(owner, repo, graphqlWithAuth);
+  
+  repos.then(x => {
+    const rr = <response> x;
+    generateJsonFile(rr.repository.issues.nodes);
+    console.log(JSON.stringify(rr));
+    console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
+    console.log(rr.repository.issues); // printing issues
+    console.log(rr);
+  }).catch(e => console.log(e));
+
+}
+
+
+// const getGraphqlWithAuth = (token: string) => { 
+//   return graphql.defaults({
+//     headers: {
+//       authorization: `bearer ${token}`,
+//     },
+//   })
+// };
+
 //query making
-const repository = async () => {
+const repository = async (owner: string, repo: string, graphqlWithAuth: any) => {
   return await graphqlWithAuth(`
   {
-    repository(owner: "veracity-dev", name: "github-xlsx") {
-      issues(last: 3) {
+    repository(owner: "${owner}", name: "${repo}") {
+      issues(last: 100) {
         nodes {
           title,
           body,
@@ -84,7 +113,7 @@ const repository = async () => {
     }
   }
 `);
-} 
+}
 type assignees = {
   avatarUrl : string,
   name : string,
@@ -113,14 +142,15 @@ type response = {
   repository: repository
 }
 
-repository().then(x => {
-  const rr = <response> x;
-  console.log(JSON.stringify(rr));
-  console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
-  console.log(rr.repository.issues); // printing issues
-  console.log(rr);
+// repository("veracity-dev", "github-xlsx").then(x => {
+//   // const rr = <response> x;
+//   console.log(JSON.stringify(x));
+//   //console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
+//   // console.log(rr.repository.issues); // printing issues
+//   // console.log(rr);
   
-}).catch(e => console.log(e));
+// }).catch(e => console.log(e));
 
+load();
 
 //getAllIssues();
