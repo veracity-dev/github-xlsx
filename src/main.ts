@@ -1,7 +1,9 @@
 import { Octokit } from "@octokit/rest";
+import { appendFile } from "fs";
 import { type } from "os";
 var json2xls = require('json2xls');
 const { graphql } = require("@octokit/graphql");
+//const flatten = require("flat").flatten;
 
 const octokit = new Octokit({baseUrl: 'https://api.github.com'});
 const prompt = require('prompt-sync')({sigint: true});
@@ -33,7 +35,7 @@ async function getAllIssues() {
         
     }
   }
-
+//convert object to xlsx
 function generateJsonFile(jsonData: any) {
   const now = new Date();
   const fileName = now.toJSON().slice(0,16).replace('\:', '-') + "_issues.xlsx"
@@ -72,14 +74,46 @@ function load() {
   const repos = repository(owner, repo, graphqlWithAuth);
   
   repos.then(x => {
-    const rr = <response> x;
-    generateJsonFile(rr.repository.issues.nodes);
-    console.log(JSON.stringify(rr));
-    console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
-    console.log(rr.repository.issues); // printing issues
-    console.log(rr);
+    const rr = <response> x; //cast (x) = retrieving data
+    const json = JSON.parse(JSON.stringify(x))
+    console.log(JSON.stringify(json['repository']['issues']['nodes']));
+    generateJsonFile(json['repository']['issues']['nodes'].map((y: any) => mapIssue(y)));
+    
+    // console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
+    // console.log(rr.repository.issues); // printing issues
+    // console.log(rr);
   }).catch(e => console.log(e));
 
+}
+const mapIssue = function(json: any) : any{
+  const out: row = {
+    number : json['number'],
+    title: json['title'],
+    state: json ['state'],
+    author: json['author']['login'],
+    body: json ['body'],
+    createdAt: json ['createdAt'],
+    lastEditedAt: json ['lastEditedAt'],
+    //milestone: json['milestone']['description'],
+    label: json['labels']['nodes'].map((x: any) => x['id']).join(", "),
+    assignee: json['assignees']['nodes'].map((x: any) => x['name']).join(", ")
+
+
+  }
+  return out;
+}
+
+type row = {
+  number: number,
+  title: string,
+  state: string,
+  author: string,
+  body: string,
+  createdAt: string,
+  lastEditedAt: string,
+  //milestone: string,
+  label: string,
+  assignee: string
 }
 
 
@@ -91,21 +125,37 @@ function load() {
 //   })
 // };
 
+
+
 //query making
 const repository = async (owner: string, repo: string, graphqlWithAuth: any) => {
+
   return await graphqlWithAuth(`
+  
   {
     repository(owner: "${owner}", name: "${repo}") {
       issues(last: 100) {
         nodes {
-          title,
-          body,
-          url,
-          assignees(first:100){
+          state
+          number
+          labels(first: 10){
             nodes{
-              avatarUrl
-              name
-              url
+              id
+            }
+          }
+          title
+          createdAt
+          author{
+           login
+          }
+          body
+          lastEditedAt
+          milestone{
+            description
+          }
+          assignees(first:10){
+            nodes{
+             name
             }
           }
         }
@@ -114,6 +164,8 @@ const repository = async (owner: string, repo: string, graphqlWithAuth: any) => 
   }
 `);
 }
+
+
 type assignees = {
   avatarUrl : string,
   name : string,
@@ -126,6 +178,7 @@ type assigneeNode = {
 type node = {
   title: string,
   body: string,
+  number: string,
   url : string,
   assignees : assigneeNode
 }
@@ -141,6 +194,7 @@ type repository = {
 type response = {
   repository: repository
 }
+
 
 // repository("veracity-dev", "github-xlsx").then(x => {
 //   // const rr = <response> x;
