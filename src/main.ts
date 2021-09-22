@@ -1,157 +1,39 @@
-import { Octokit } from "@octokit/rest";
-import { type } from "os";
-var json2xls = require('json2xls');
-const { graphql } = require("@octokit/graphql");
-const argv = require("minimist")(process.argv.slice(2));
+import {load} from "./gh";
+import { generateXlsxFile} from "./xlsx";
+import { exit } from "process";
 
-const octokit = new Octokit({baseUrl: 'https://api.github.com'});
-const prompt = require('prompt-sync')({sigint: true});
-var fs = require("fs");
-
-/**
- * Fetching all the issues
- * @param owner 
- * @param repo 
- * @param state
- */
- 
-// async function getAllIssues() {
-//     try {
-
-//       const repo = prompt('Enter Repo Name: ');
-//       const owner = prompt('Enter Owner Name: ');
-
-//       const {data} = await octokit.rest.issues.listForRepo({
-//         owner: owner,
-//         repo: repo,
-//         state: 'all'
-//       })
-  
-//       generateJsonFile(data.map(i => objectTransfer(i)));
-      
-//     } catch (error) {
-//         console.log("Ërror",error);
-        
-//     }
-//   }
-
-function generateJsonFile(jsonData: any) {
-  const now = new Date();
-  const fileName = now.toJSON().slice(0,16).replace('\:', '-') + "_issues.xlsx"
-  var xls = json2xls(jsonData);
-  fs.writeFileSync(fileName, xls, 'binary');
-  console.log("Date : ", jsonData);
+// Need the GitHub PAT
+const GH_PAT = process.env.GH_PAT;
+if (!GH_PAT) {
+  console.error("Please define GH_PAT enviornment variable")
+  console.log("and set it to your GitHub Persosnal Access Token.")
+  exit(0);
 }
 
-// function objectTransfer(jsonData: any){
-//   var pull_request = jsonData['pull_request']
-
-//   if(pull_request){
-//     return{}
-//   }else{
-//     return {
-//     'Number': jsonData['number'],
-//     'Title': jsonData['title'],
-//     'Creation_On' : jsonData['created_at'],
-//     'Last_Updated_On': jsonData['updated_at'],
-//     'Status': jsonData['state'],
-//     }
-//   }
-// }
-
-function load() {
-  // const repo = prompt('Enter Repo Name: ');
-  // const owner = prompt('Enter Owner Name: ');
-  // const token = prompt('Enter Token: ');
-
-  const graphqlWithAuth = graphql.defaults({
-    headers: {
-      authorization: `bearer ${argv.token}`,
-    },
-  });
-
-  const repos = repository(argv.owner, argv.repo, graphqlWithAuth);
-  
-  repos.then(x => {
-    const rr = <response> x;
-    generateJsonFile(rr.repository.issues.nodes);
-    console.log(JSON.stringify(rr));
-    console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
-    console.log(rr.repository.issues); // printing issues
-    console.log(rr);
-  }).catch(e => console.log(e));
-
+// Need the GitHub repo name in org-name/repo-name format
+if (process.argv.length < 3) {
+  console.error("Repo should be specified")
+  console.error("Usage:")
+  console.error("node main.js veracity-dev/github-xlsx")  
+  exit(0);
 }
+const REPO = process.argv[2];
 
-
-// const getGraphqlWithAuth = (token: string) => { 
-//   return graphql.defaults({
-//     headers: {
-//       authorization: `bearer ${token}`,
-//     },
-//   })
-// };
-
-//query making
-const repository = async (owner: string, repo: string, graphqlWithAuth: any) => {
-  return await graphqlWithAuth(`
-  {
-    repository(owner: "${argv.owner}", name: "${argv.repo}") {
-      issues(last: 100) {
-        nodes {
-          title,
-          body,
-          url,
-          assignees(first:100){
-            nodes{
-              avatarUrl
-              name
-              url
-            }
-          }
-        }
-      }
-    }
-  }
-`);
+// TODO: Check if REPO string is in org-name/repo-name format
+const [ownerName, repoName] = REPO.split('/');
+if (!repoName) {
+  console.error("Repo name is required")
+  console.error("Usage:")
+  console.error("node main.js veracity-dev/github-xlsx")
+  exit(0);
 }
-type assignees = {
-  avatarUrl : string,
-  name : string,
-  url :string
+console.log(`Working with ${ownerName}/${repoName}`);
 
-}
-type assigneeNode = {
-  node: assignees []
-}
-type node = {
-  title: string,
-  body: string,
-  url : string,
-  assignees : assigneeNode
-}
 
-type issues = {
-  nodes: node[] 
-}
+(async function() {
+  const reportData = await load(ownerName, repoName, GH_PAT);
+  // console.log(reportData);
 
-type repository = {
-  issues: issues
-}
+  await generateXlsxFile(reportData);
+})();
 
-type response = {
-  repository: repository
-}
-
-// repository("veracity-dev", "github-xlsx").then(x => {
-//   // const rr = <response> x;
-//   console.log(JSON.stringify(x));
-//   //console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
-//   // console.log(rr.repository.issues); // printing issues
-//   // console.log(rr);
-  
-// }).catch(e => console.log(e));
-
-load();
-
-//getAllIssues();
