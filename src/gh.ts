@@ -2,19 +2,24 @@
 import { graphql } from "@octokit/graphql";
 
 export const repository = async (owner: string, repo: string, graphqlWithAuth: any) => {
-    return await graphqlWithAuth(`
+  return await graphqlWithAuth(`
   {
     repository(owner: "${owner}", name: "${repo}") {
       issues(last: 100) {
         nodes {
+          number,
           title,
-          body,
           url,
-          assignees(first:100){
+          createdAt,
+          lastEditedAt,          
+          labels(first:10){
             nodes{
-              avatarUrl
               name
-              url
+            }
+          }          
+          assignees(first:10){
+            nodes{
+              name
             }
           }
         }
@@ -25,34 +30,34 @@ export const repository = async (owner: string, repo: string, graphqlWithAuth: a
 }
 
 type assignees = {
-    avatarUrl: string,
-    name: string,
-    url: string
+  avatarUrl: string,
+  name: string,
+  url: string
 
 }
 type assigneeNode = {
-    node: assignees[]
+  node: assignees[]
 }
 type node = {
-    title: string,
-    body: string,
-    url: string,
-    assignees: assigneeNode
+  title: string,
+  body: string,
+  url: string,
+  assignees: assigneeNode
 }
 
 type issues = {
-    nodes: node[]
+  nodes: node[]
 }
 
 type repository = {
-    issues: issues
+  issues: issues
 }
 
 export type response = {
-    repository: repository
+  repository: repository
 }
 
-export async function load(owner:string, repo:string, pat: string) {
+export async function getIssuesFromGH(owner: string, repo: string, pat: string) {
   try {
     const graphqlWithAuth = graphql.defaults({
       headers: {
@@ -63,15 +68,24 @@ export async function load(owner:string, repo:string, pat: string) {
     const x = await repository(owner, repo, graphqlWithAuth);
 
     const rr = <response>x;
-    console.log(JSON.stringify(rr));
-    
+    // console.log(JSON.stringify(rr));
+
     // console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
     // console.log(rr.repository.issues); // printing issues
     // console.log(rr);
 
-    return rr.repository.issues.nodes;
+    return preparedData(rr.repository.issues.nodes);
   } catch (error) {
     console.error(error);
-    return []; 
+    return [];
   }
+}
+
+
+function preparedData(data: any): any {
+  // TODO: Make labels a comma seprated list
+  // TODO: Make assignees a comma seprated list
+  // TODO: Make the tile a link (using the URL field)
+
+  return data;
 }
