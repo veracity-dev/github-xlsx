@@ -9,12 +9,15 @@ export const repository = async (owner: string, repo: string, graphqlWithAuth: a
         nodes {
           number,
           title,
-          url,
+          state,
           createdAt,
-          lastEditedAt,          
+          lastEditedAt, 
+          author{
+            login
+           }         
           labels(first:10){
             nodes{
-              name
+              id
             }
           }          
           assignees(first:10){
@@ -68,11 +71,7 @@ export async function getIssuesFromGH(owner: string, repo: string, pat: string) 
     const x = await repository(owner, repo, graphqlWithAuth);
 
     const rr = <response>x;
-    // console.log(JSON.stringify(rr));
 
-    // console.log(rr.repository.issues.nodes[2].assignees); //getting assignees
-    // console.log(rr.repository.issues); // printing issues
-    // console.log(rr);
 
     return preparedData(rr.repository.issues.nodes);
   } catch (error) {
@@ -83,9 +82,41 @@ export async function getIssuesFromGH(owner: string, repo: string, pat: string) 
 
 
 function preparedData(data: any): any {
+  
+
   // TODO: Make labels a comma seprated list
   // TODO: Make assignees a comma seprated list
   // TODO: Make the tile a link (using the URL field)
 
-  return data;
+  return data.map((y: any) => mapIssue(y)) 
+}
+
+const mapIssue = function(json: any) : any{
+  const out: row = {
+    number : json['number'],
+    title: json['title'],
+    state: json ['state'],
+    author: json['author']['login'],
+    body: json ['body'],
+    createdAt: json ['createdAt'],
+    lastEditedAt: json ['lastEditedAt'],
+    //milestone: json['milestone']['description'],
+    label: json['labels']['nodes'].map((x: any) => x['id']).join(", "),
+    assignee: json['assignees']['nodes'].map((x: any) => x['name']).join(", ")
+
+
+  }
+  return out;
+}
+type row = {
+  number: number,
+  title: string,
+  state: string,
+  author: string,
+  body: string,
+  createdAt: string,
+  lastEditedAt: string,
+  //milestone: string,
+  label: string,
+  assignee: string
 }
