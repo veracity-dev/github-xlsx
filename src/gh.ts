@@ -10,6 +10,7 @@ export const repository = async (owner: string, repo: string, graphqlWithAuth: a
           number,
           title,
           state,
+          url,
           createdAt,
           lastEditedAt, 
           author{
@@ -98,6 +99,7 @@ const mapIssue = function(json: any) : any{
     state: json ['state'],
     author: json['author']['login'],
     body: json ['body'],
+    url: json ['url'],
     createdAt: json ['createdAt'],
     lastEditedAt: json ['lastEditedAt'],
     //milestone: json['milestone']['description'],
@@ -114,6 +116,7 @@ type row = {
   state: string,
   author: string,
   body: string,
+  url: string,
   createdAt: string,
   lastEditedAt: string,
   //milestone: string,
