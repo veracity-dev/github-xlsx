@@ -8,6 +8,7 @@ export function generateXlsxFile(fileName: string, jsonData: any) {
     { header: "ISSUE_NUMBER", key: "number", width: 20 },
     { header: "ASSIGNEES", key: "assignee", width: 150 },
     { header: "LABEL", key: "label", width: 35 },
+    { header: "MILESTONE", key: "milestone", width: 35 },
     { header: "AUTHOR", key: "author", width: 20 },
     { header: "BODY", key: "body" },
     { header: "STATE", key: "state" },

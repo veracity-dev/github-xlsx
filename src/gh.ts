@@ -1,5 +1,19 @@
 import { graphql } from "@octokit/graphql";
 
+export type GithubIssue = {
+  number: number;
+  title: string;
+  state: string;
+  author: string;
+  body: string;
+  url: string;
+  createdAt: string;
+  lastEditedAt: string;
+  milestone: string;
+  label: string;
+  assignee: string;
+};
+
 export const repository = async (
   owner: string,
   repo: string,
@@ -23,7 +37,10 @@ export const repository = async (
             nodes{
               id
             }
-          }          
+          },
+          milestone {
+            title
+          },          
           assignees(first:10){
             nodes{
               name
@@ -78,7 +95,7 @@ export async function getIssuesFromGH(
     const x = await repository(owner, repo, graphqlWithAuth);
 
     const rr = <response>x;
-
+    console.log(rr.repository.issues.nodes);
     return preparedData(rr.repository.issues.nodes);
   } catch (error) {
     console.error(error);
@@ -87,15 +104,11 @@ export async function getIssuesFromGH(
 }
 
 function preparedData(data: any): any {
-  // TODO: Make labels a comma seprated list
-  // TODO: Make assignees a comma seprated list
-  // TODO: Make the tile a link (using the URL field)
-
   return data.map((y: any) => mapIssue(y));
 }
 
-const mapIssue = function (json: any): any {
-  const out: row = {
+const mapIssue = function (json: any): GithubIssue {
+  return {
     number: json["number"],
     title: json["title"],
     state: json["state"],
@@ -104,22 +117,8 @@ const mapIssue = function (json: any): any {
     url: json["url"],
     createdAt: json["createdAt"],
     lastEditedAt: json["lastEditedAt"],
-    //milestone: json['milestone']['description'],
+    milestone: json["milestone"] ? json["milestone"]["title"] : "",
     label: json["labels"]["nodes"].map((x: any) => x["id"]).join(", "),
     assignee: json["assignees"]["nodes"].map((x: any) => x["name"]).join(", "),
   };
-  return out;
-};
-type row = {
-  number: number;
-  title: string;
-  state: string;
-  author: string;
-  body: string;
-  url: string;
-  createdAt: string;
-  lastEditedAt: string;
-  //milestone: string,
-  label: string;
-  assignee: string;
 };
