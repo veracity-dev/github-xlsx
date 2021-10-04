@@ -1,7 +1,10 @@
-
 import { graphql } from "@octokit/graphql";
 
-export const repository = async (owner: string, repo: string, graphqlWithAuth: any) => {
+export const repository = async (
+  owner: string,
+  repo: string,
+  graphqlWithAuth: any
+) => {
   return await graphqlWithAuth(`
   {
     repository(owner: "${owner}", name: "${repo}") {
@@ -31,37 +34,40 @@ export const repository = async (owner: string, repo: string, graphqlWithAuth: a
     }
   }
 `);
-}
+};
 
 type assignees = {
-  avatarUrl: string,
-  name: string,
-  url: string
-
-}
+  avatarUrl: string;
+  name: string;
+  url: string;
+};
 type assigneeNode = {
-  node: assignees[]
-}
+  node: assignees[];
+};
 type node = {
-  title: string,
-  body: string,
-  url: string,
-  assignees: assigneeNode
-}
+  title: string;
+  body: string;
+  url: string;
+  assignees: assigneeNode;
+};
 
 type issues = {
-  nodes: node[]
-}
+  nodes: node[];
+};
 
 type repository = {
-  issues: issues
-}
+  issues: issues;
+};
 
 export type response = {
-  repository: repository
-}
+  repository: repository;
+};
 
-export async function getIssuesFromGH(owner: string, repo: string, pat: string) {
+export async function getIssuesFromGH(
+  owner: string,
+  repo: string,
+  pat: string
+) {
   try {
     const graphqlWithAuth = graphql.defaults({
       headers: {
@@ -73,7 +79,6 @@ export async function getIssuesFromGH(owner: string, repo: string, pat: string) 
 
     const rr = <response>x;
 
-
     return preparedData(rr.repository.issues.nodes);
   } catch (error) {
     console.error(error);
@@ -81,45 +86,40 @@ export async function getIssuesFromGH(owner: string, repo: string, pat: string) 
   }
 }
 
-
 function preparedData(data: any): any {
-  
-
   // TODO: Make labels a comma seprated list
   // TODO: Make assignees a comma seprated list
   // TODO: Make the tile a link (using the URL field)
 
-  return data.map((y: any) => mapIssue(y)) 
+  return data.map((y: any) => mapIssue(y));
 }
 
-const mapIssue = function(json: any) : any{
+const mapIssue = function (json: any): any {
   const out: row = {
-    number : json['number'],
-    title: json['title'],
-    state: json ['state'],
-    author: json['author']['login'],
-    body: json ['body'],
-    url: json ['url'],
-    createdAt: json ['createdAt'],
-    lastEditedAt: json ['lastEditedAt'],
+    number: json["number"],
+    title: json["title"],
+    state: json["state"],
+    author: json["author"]["login"],
+    body: json["body"],
+    url: json["url"],
+    createdAt: json["createdAt"],
+    lastEditedAt: json["lastEditedAt"],
     //milestone: json['milestone']['description'],
-    label: json['labels']['nodes'].map((x: any) => x['id']).join(", "),
-    assignee: json['assignees']['nodes'].map((x: any) => x['name']).join(", ")
-
-
-  }
+    label: json["labels"]["nodes"].map((x: any) => x["id"]).join(", "),
+    assignee: json["assignees"]["nodes"].map((x: any) => x["name"]).join(", "),
+  };
   return out;
-}
+};
 type row = {
-  number: number,
-  title: string,
-  state: string,
-  author: string,
-  body: string,
-  url: string,
-  createdAt: string,
-  lastEditedAt: string,
+  number: number;
+  title: string;
+  state: string;
+  author: string;
+  body: string;
+  url: string;
+  createdAt: string;
+  lastEditedAt: string;
   //milestone: string,
-  label: string,
-  assignee: string
-}
+  label: string;
+  assignee: string;
+};
