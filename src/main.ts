@@ -15,9 +15,16 @@ try {
 console.log(`Working with ${config.orgName}/${config.repoName}`);
 
 (async function () {
-  const reportData = await getIssuesFromGH(config.orgName, config.repoName, config.ghPAT);
+  const reportData = await getIssuesFromGH(
+    config.orgName,
+    config.repoName,
+    config.ghPAT
+  );
 
-  const fileName = `${new Date().toJSON().slice(0, 16).replace('\:', '-')}-issues`
+  const fileName = `${new Date()
+    .toJSON()
+    .slice(0, 16)
+    .replace(":", "-")}-issues`;
   await generateJsonFile(fileName, reportData);
   await generateXlsxFile(fileName, reportData);
 })();

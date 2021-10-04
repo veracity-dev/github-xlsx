@@ -20,6 +20,6 @@
     },
     "dependencies": {
         "@octokit/graphql": "^4.8.0",
-        "json2xls": "^0.1.2"
+        "exceljs": "^4.3.0"
     }
 }
