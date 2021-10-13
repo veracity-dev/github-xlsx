@@ -1,19 +1,5 @@
 import { graphql } from "@octokit/graphql";
 
-export type GithubIssue = {
-  number: number;
-  title: string;
-  state: string;
-  author: string;
-  body: string;
-  url: string;
-  createdAt: string;
-  lastEditedAt: string;
-  milestone: string;
-  label: string;
-  assignee: string;
-};
-
 export const repository = async (
   owner: string,
   repo: string,
@@ -25,27 +11,25 @@ export const repository = async (
       issues(last: 100) {
         nodes {
           number,
-          title,
           state,
-          url,
-          createdAt,
-          lastEditedAt, 
-          author{
-            login
-           }         
-          labels(first:10){
-            nodes{
-              id
-            }
-          },
-          milestone {
-            title
-          },          
-          assignees(first:10){
+          assignees(first:1){
             nodes{
               name
             }
           }
+          title,
+          updatedAt,
+          createdAt,
+          labels(last:10){
+            nodes{
+              description
+            }
+          }
+          body,
+          url,
+          author{
+            login
+          }          
         }
       }
     }
@@ -65,6 +49,8 @@ type node = {
   title: string;
   body: string;
   url: string;
+  description: string;
+  updatedAt: string;
   assignees: assigneeNode;
 };
 
@@ -95,7 +81,6 @@ export async function getIssuesFromGH(
     const x = await repository(owner, repo, graphqlWithAuth);
 
     const rr = <response>x;
-    console.log(rr.repository.issues.nodes);
     return preparedData(rr.repository.issues.nodes);
   } catch (error) {
     console.error(error);
@@ -108,17 +93,35 @@ function preparedData(data: any): any {
 }
 
 const mapIssue = function (json: any): GithubIssue {
-  return {
+
+
+  const out: row = {
     number: json["number"],
-    title: json["title"],
     state: json["state"],
+    assignee: json["assignees"]["nodes"].map((x: any) => x["name"]).join(", "),
+    title: json["title"],
+    updatedAt: json["updatedAt"],
+    createdAt: json["createdAt"],
+    labels: json["labels"]["nodes"]
+      .map((x: any) => x["description"])
+      .join(", "),
     author: json["author"]["login"],
     body: json["body"],
     url: json["url"],
-    createdAt: json["createdAt"],
-    lastEditedAt: json["lastEditedAt"],
-    milestone: json["milestone"] ? json["milestone"]["title"] : "",
-    label: json["labels"]["nodes"].map((x: any) => x["id"]).join(", "),
-    assignee: json["assignees"]["nodes"].map((x: any) => x["name"]).join(", "),
   };
+
+  return out;
+};
+
+type row = {
+  number: number;
+  title: string;
+  state: string;
+  author: string;
+  body: string;
+  url: string;
+  createdAt: string;
+  updatedAt: string;
+  labels: string;
+  assignee: string;
 };
